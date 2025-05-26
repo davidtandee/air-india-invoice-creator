@@ -17,6 +17,7 @@ export interface InvoiceData {
   stateCode: string;
   placeOfDelivery: string;
   companyAddress: string;
+  companyLogo?: string;
   items: InvoiceItem[];
 }
 

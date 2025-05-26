@@ -18,9 +18,19 @@ const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
           <div className="border-2 border-gray-300 p-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                  AI
-                </div>
+                {invoiceData.companyLogo ? (
+                  <div className="w-12 h-12 rounded-full overflow-hidden">
+                    <img 
+                      src={invoiceData.companyLogo} 
+                      alt="Company Logo" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                    AI
+                  </div>
+                )}
                 <div>
                   <h1 className="text-2xl font-bold text-gray-800">Air India Limited</h1>
                   <p className="text-sm text-gray-600">Excellence in Aviation</p>

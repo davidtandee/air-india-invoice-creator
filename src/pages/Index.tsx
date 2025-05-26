@@ -8,16 +8,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, Plus, Trash2, Download, Printer } from 'lucide-react';
+import { CalendarIcon, Plus, Trash2, Download, Printer, Upload, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import InvoicePreview from '@/components/InvoicePreview';
 import { InvoiceData, InvoiceItem } from '@/types/invoice';
+import { indianStates, descriptionOptions } from '@/utils/indianStates';
 
 const Index = () => {
   const { toast } = useToast();
   const invoiceRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [invoiceData, setInvoiceData] = useState<InvoiceData>({
     invoiceNumber: '',
@@ -28,6 +30,7 @@ const Index = () => {
     stateCode: '',
     placeOfDelivery: '',
     companyAddress: 'Airlines House, 113, Gurudwara Rakabganj Road, New Delhi - 110001',
+    companyLogo: '',
     items: [
       {
         id: 1,
@@ -39,6 +42,38 @@ const Index = () => {
       }
     ]
   });
+
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast({
+          title: "Error",
+          description: "Logo file size should be less than 5MB",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setInvoiceData(prev => ({ ...prev, companyLogo: result }));
+        toast({
+          title: "Success",
+          description: "Logo uploaded successfully!"
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeLogo = () => {
+    setInvoiceData(prev => ({ ...prev, companyLogo: '' }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const addItem = () => {
     const newItem: InvoiceItem = {
@@ -136,6 +171,48 @@ const Index = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Logo Upload */}
+                <div className="space-y-2">
+                  <Label>Company Logo</Label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex items-center gap-2"
+                    >
+                      <Upload className="h-4 w-4" />
+                      Upload Logo
+                    </Button>
+                    {invoiceData.companyLogo && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={removeLogo}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                  {invoiceData.companyLogo && (
+                    <div className="w-16 h-16 border rounded-lg overflow-hidden">
+                      <img 
+                        src={invoiceData.companyLogo} 
+                        alt="Logo preview" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
+
                 {/* Company Info */}
                 <div className="space-y-2">
                   <Label htmlFor="companyAddress">Company Address</Label>
@@ -225,12 +302,21 @@ const Index = () => {
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <Label htmlFor="stateCode">State/Code</Label>
-                      <Input
-                        id="stateCode"
+                      <Select
                         value={invoiceData.stateCode}
-                        onChange={(e) => setInvoiceData(prev => ({ ...prev, stateCode: e.target.value }))}
-                        placeholder="07"
-                      />
+                        onValueChange={(value) => setInvoiceData(prev => ({ ...prev, stateCode: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select state" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-48">
+                          {indianStates.map((state) => (
+                            <SelectItem key={state.code} value={`${state.code} - ${state.name}`}>
+                              {state.code} - {state.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div>
                       <Label htmlFor="placeOfDelivery">Place of Delivery</Label>
@@ -272,11 +358,28 @@ const Index = () => {
 
                         <div>
                           <Label>Description</Label>
+                          <div className="flex gap-2">
+                            <Select
+                              value={item.description}
+                              onValueChange={(value) => updateItem(item.id, 'description', value)}
+                            >
+                              <SelectTrigger className="text-sm">
+                                <SelectValue placeholder="Select or type description" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {descriptionOptions.map((option) => (
+                                  <SelectItem key={option} value={option}>
+                                    {option}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
                           <Input
                             value={item.description}
                             onChange={(e) => updateItem(item.id, 'description', e.target.value)}
-                            placeholder="Service description"
-                            className="text-sm"
+                            placeholder="Or type custom description"
+                            className="text-sm mt-2"
                           />
                         </div>
 
