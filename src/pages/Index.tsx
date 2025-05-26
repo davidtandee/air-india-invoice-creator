@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +13,7 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import InvoicePreview from '@/components/InvoicePreview';
 import { InvoiceData, InvoiceItem } from '@/types/invoice';
-import { indianStates, descriptionOptions } from '@/utils/indianStates';
+import { indianStates, descriptionOptions, unitPriceOptions } from '@/utils/indianStates';
 
 const Index = () => {
   const { toast } = useToast();
@@ -320,11 +319,26 @@ const Index = () => {
                     </div>
                     <div>
                       <Label htmlFor="placeOfDelivery">Place of Delivery</Label>
+                      <Select
+                        value={invoiceData.placeOfDelivery}
+                        onValueChange={(value) => setInvoiceData(prev => ({ ...prev, placeOfDelivery: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select state" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-48">
+                          {indianStates.map((state) => (
+                            <SelectItem key={state.code} value={state.name}>
+                              {state.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <Input
-                        id="placeOfDelivery"
                         value={invoiceData.placeOfDelivery}
                         onChange={(e) => setInvoiceData(prev => ({ ...prev, placeOfDelivery: e.target.value }))}
-                        placeholder="Delhi"
+                        placeholder="Or type custom location"
+                        className="text-sm mt-2"
                       />
                     </div>
                   </div>
@@ -386,11 +400,27 @@ const Index = () => {
                         <div className="grid grid-cols-2 gap-2">
                           <div>
                             <Label>Unit Price (₹)</Label>
+                            <Select
+                              value={item.unitPrice.toString()}
+                              onValueChange={(value) => updateItem(item.id, 'unitPrice', parseFloat(value))}
+                            >
+                              <SelectTrigger className="text-sm">
+                                <SelectValue placeholder="Select price" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {unitPriceOptions.map((price) => (
+                                  <SelectItem key={price} value={price.toString()}>
+                                    ₹ {price}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                             <Input
                               type="number"
                               value={item.unitPrice}
                               onChange={(e) => updateItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)}
-                              className="text-sm"
+                              placeholder="Or type custom price"
+                              className="text-sm mt-2"
                             />
                           </div>
                           <div>

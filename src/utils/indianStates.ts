@@ -47,3 +47,13 @@ export const descriptionOptions = [
   'COURIER CHARGES FEE',
   'GATE PASS MAKING FEE'
 ];
+
+export const unitPriceOptions = [
+  2000,
+  3950,
+  350,
+  6050,
+  10000,
+  5000,
+  3000
+];
