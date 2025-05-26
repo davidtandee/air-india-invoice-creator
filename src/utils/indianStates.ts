@@ -49,6 +49,7 @@ export const descriptionOptions = [
 ];
 
 export const unitPriceOptions = [
+  1000,
   2000,
   3950,
   350,
