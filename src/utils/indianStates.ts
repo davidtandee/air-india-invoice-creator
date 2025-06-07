@@ -49,12 +49,19 @@ export const descriptionOptions = [
 ];
 
 export const unitPriceOptions = [
+  100,
+  200,
+  300,
+  400,
+  500,
   1000,
   2000,
+  3000,
   3950,
-  350,
+  4950,
+  5000,
+  6000,
   6050,
   10000,
-  5000,
-  3000
+  350
 ];
